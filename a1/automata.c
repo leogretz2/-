@@ -52,13 +52,14 @@ gen: bit pattern
   return out;
 }
 
+// Find unsigned long that represents next row in automata output
 unsigned long advance(unsigned long cur_gen, unsigned char ruleset){
-// advance cur_gen
+  // advance cur_gen
   int ruleArray[CHAR_BIT];
   ruleset2array(ruleset, ruleArray);
   unsigned long out = 0;
   for (int i = MSB; i >= 0; i--){
-    // start from the 63rd bit
+    // start from the 63rd bit (MSB is sizeof(long)-1)
     int patternCode = findPatternCode(i, cur_gen);
     //at the start, look at 64th, 63rd, 62nd bits
     //there is no 64th. ok. gives 0 contribution
@@ -69,20 +70,23 @@ unsigned long advance(unsigned long cur_gen, unsigned char ruleset){
   return out;
 }
 
+// Outputs 64 bits based on in long (8 bytes)
 void draw_generation(unsigned long gen){
 // draw gen, starting from the MSB
   const char *font[] = { EMPTY_STR, LIVE_STR };
 
-  //printf("%s\n", font[gen != 0]);
+  printf("%s\n", font[gen != 0]);
+
   for (int i = MSB; i >= 0; i--){
     long bit = 1L << i;
-    if ((gen & bit) > 0)
+    if ((gen & bit) > 0){
       printf("%s",LIVE_STR);
-    else
+    }
+    else{
       printf("%s", EMPTY_STR);
     // printf("%s", font[(gen & bit) > 0]);
+    }
   }
-  printf("\n");
 }
 
 
@@ -105,27 +109,31 @@ unsigned long convert_arg(const char *str, unsigned long low, unsigned long high
 int main(int argc, char *argv[])
 {
     unsigned long long gen_0 = 10ULL << 16; // pow(2,128)-1;
-    unsigned char ruleset = 30;
 
-    printf("%llu\n",gen_0);
+    printf("%d\n", findPatternCode(31,gen_0));
+
+    printf("llu %llu\n",gen_0);
 
     if (argc < 2)
         fprintf(stderr, "Missing argument. Please supply ruleset and optional initial generation: %s\n", strerror(errno));
 
-    ruleset = convert_arg(argv[1], 0, UCHAR_MAX, "ruleset");
+    unsigned char ruleset = convert_arg(argv[1], 0, UCHAR_MAX, "ruleset");
     if (argc > 2) gen_0 = convert_arg(argv[2], 0, ULONG_MAX, "initial generation");
 
-    // if (ruleset == 0) {
-    //     draw_generation(gen_0);
-    // } else {
-    //     unsigned long gen = gen_0;
-    //     for (int i = 0; i < 32; i++) {
-    //         draw_generation(gen);
-    //         gen = advance(gen, ruleset);
-    //     }
-    // }
+    if (ruleset == 0) {
+        draw_generation(gen_0);
+    } else {
+        unsigned long gen = gen_0;
+        for (int i = 0; i < 32; i++) {
+            draw_generation(gen);
+            unsigned long last_gen = gen;
+            gen = advance(gen, ruleset);
+            if(last_gen == gen)
+              break;
+        }
+    }
     // printf("Flip: %llu",gen_0);
-    draw_generation(gen_0);
+    // draw_generation(gen_0);
     return 0;
 }
 
