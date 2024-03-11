@@ -9,34 +9,54 @@
 #define US (unsigned short)
 
 int to_utf8(unsigned short cp, unsigned char seq[]){
-// takes in a utf-8 code point
-// returns a utf-8 encoded sequence
-
-  //printf("%hu", (short)0x0800);
-  unsigned short edges[4] = {US 0x0000,
+    unsigned short edges[4] = {US 0x0000,
                              US 0x0080,
                              US 0x0800};
-  if (edges[0] <= cp && cp < edges[1]){
-    seq[0] = cp;
-    return 1;
-  } else if (edges[1] <= cp && cp < edges[2]){
-    seq[0] = '\xC0' + (char)((cp & US 0x07C0) >> 6);
-    seq[1] = '\x80' + (char) (cp & US 0x003F);
-    return 2;
-  } else if (edges[2] <= cp){
-    seq[0] = '\xE0' + (char)((cp & US 0xF000) >> 12);
-    seq[1] = '\x80' + (char)((cp & US 0x0FC0) >> 6);
-    seq[2] = '\x80' + (char) (cp & US 0x003F);
-    return 3;
-  } else
-    exit(1);
-  return 0;
+    if (edges[0] < cp && cp <= edges[1]) {
+      seq[0] = cp;
+      return 1;
+    } else if (cp <= edges[2]){
+      seq[0] = 0xC0 | (cp >> 6);
+      seq[1] = 0x80 | (cp & 0x3F);
+      return 2;
+    } else if (edges[2] < cp) {
+      seq[0] = 0xE0 | (cp >> 12);
+      seq[1] = 0x80 | ((cp >> 6) & 0x3F);
+      seq[2] = 0x80 | (cp & 0x3F);
+      return 3;
+    } else {
+      return 0;
+    }
 }
 
 
 
-
 // ------- DO NOT EDIT ANY CODE BELOW THIS LINE (but do add comments!)  -------
+
+// int to_utf8(unsigned short cp, unsigned char seq[]){
+// // takes in a utf-8 code point
+// // returns a utf-8 encoded sequence
+
+//   //printf("%hu", (short)0x0800);
+//   unsigned short edges[4] = {US 0x0000,
+//                              US 0x0080,
+//                              US 0x0800};
+//   if (edges[0] <= cp && cp < edges[1]){
+//     seq[0] = cp;
+//     return 1;
+//   } else if (edges[1] <= cp && cp < edges[2]){
+//     seq[0] = '\xC0' + (char)((cp & US 0x07C0) >> 6);
+//     seq[1] = '\x80' + (char) (cp & US 0x003F);
+//     return 2;
+//   } else if (edges[2] <= cp){
+//     seq[0] = '\xE0' + (char)((cp & US 0xF000) >> 12);
+//     seq[1] = '\x80' + (char)((cp & US 0x0FC0) >> 6);
+//     seq[2] = '\x80' + (char) (cp & US 0x003F);
+//     return 3;
+//   } else
+//     exit(1);
+//   return 0;
+// }
 
 void print_utf8(unsigned short cp, unsigned char seq[], int len)
 {

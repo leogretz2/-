@@ -75,7 +75,7 @@ void draw_generation(unsigned long gen){
 // draw gen, starting from the MSB
   const char *font[] = { EMPTY_STR, LIVE_STR };
 
-  printf("%s\n", font[gen != 0]);
+  // printf("%s\n", font[gen != 0]);
 
   for (int i = MSB; i >= 0; i--){
     long bit = 1L << i;
@@ -87,6 +87,7 @@ void draw_generation(unsigned long gen){
     // printf("%s", font[(gen & bit) > 0]);
     }
   }
+  printf("\n");
 }
 
 
@@ -108,9 +109,9 @@ unsigned long convert_arg(const char *str, unsigned long low, unsigned long high
 
 int main(int argc, char *argv[])
 {
-    unsigned long long gen_0 = 10ULL << 16; // pow(2,128)-1;
+    unsigned long long gen_0 = 1L << 32; // 10ULL << 16; // pow(2,128)-1;
 
-    printf("%d\n", findPatternCode(31,gen_0));
+    printf("b: %d\n", findPatternCode(31,gen_0));
 
     printf("llu %llu\n",gen_0);
 
@@ -133,7 +134,10 @@ int main(int argc, char *argv[])
         }
     }
     // printf("Flip: %llu",gen_0);
+    // printf("1\n");
     // draw_generation(gen_0);
+    // unsigned long next = advance(gen_0, ruleset);
+    // draw_generation(next);
     return 0;
 }
 
